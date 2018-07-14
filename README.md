@@ -25,7 +25,7 @@ If you just want to use this feature in your Vim, do the following:
     set conceallevel=2
     set concealcursor=
     ```
-1. [Download](../java.vim) `java.vim` from the root directory of this repo.
+1. [Download](../blob/master/java.vim) `java.vim` from the root directory of this repo.
 2. In the folder `/syntax` under your vim installation directory locate the
    namesake file and replace it with its downloaded version. By default it
    should reside in:
