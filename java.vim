@@ -37,7 +37,7 @@ syn match javaExternal		"\<import\>\(\s\+static\>\)\?"
 syn keyword javaError		goto const
 syn keyword javaConditional	if else switch
 syn keyword javaRepeat		while for do
-syn keyword javaBoolean		true false
+syn match javaBoolean		"\v(true|false)"
 syn keyword javaConstant	null
 syn keyword javaTypedef		this super
 syn keyword javaOperator	new instanceof
@@ -350,7 +350,6 @@ if exists('g:java_concealment_use_let')
         let s:l = 'v'
         let s:e = 'a'
         let s:t = 'l'
-        echomsg 'We use VAL now'
     endif
 endif
 " Do we want to use '@NotNull'?
@@ -359,7 +358,6 @@ if exists('g:java_concealment_use_notnull')
     let s:use_not_null = get(g:, 'java_concealment_use_notnull')
     if s:use_not_null == 0
         let s:not_null = ' \(@NotNull \)\?'
-        echomsg "Don't use NotNull"
     endif
 endif
 " Define some functions
@@ -368,7 +366,6 @@ function! ConcealAll()
     execute 'syntax match Conceal "final' . s:not_null . '\w\+"me=s+1 conceal cchar=' . s:l
     execute 'syntax match Conceal "inal'. s:not_null . '\w\+"me=s+1 conceal cchar=' . s:e
     execute 'syntax match Conceal "nal'. s:not_null . '\w\+" conceal cchar=' . s:t
-    echomsg 'Conceal EVERYTHING'
 endfunction
 
 function! ConcealPrimitive()
@@ -377,14 +374,12 @@ function! ConcealPrimitive()
         execute 'syntax match Conceal "inal'. s:not_null . keyword . '"me=s+1 conceal cchar=' . s:e
         execute 'syntax match Conceal "nal'. s:not_null . keyword . '" conceal cchar=' . s:t
     endfor
-    echomsg 'Conceal only primitive'
 endfunction
 
 function! ConcealVar()
     execute 'syntax match Conceal "final' . s:not_null . 'var"me=s+1 conceal cchar=' . s:l
     execute 'syntax match Conceal "inal'. s:not_null . 'var"me=s+1 conceal cchar=' . s:e
     execute 'syntax match Conceal "nal'. s:not_null . 'var" conceal cchar=' . s:t
-    echomsg 'Conceal only var'
 endfunction
 
 " Start concealment
@@ -399,7 +394,7 @@ else
 endif
 
 if exists('g:java_concealment_hide_semicolons') && get(g:, 'java_concealment_hide_semicolons') == 1
-    syntax match Conceal ';' conceal
+    syntax match Conceal ';$' conceal
 endif
 
 if exists('g:java_concealment_procedure') && get(g:, 'java_concealment_procedure') == 1
@@ -424,6 +419,45 @@ if exists('g:java_concealment_procedure') && get(g:, 'java_concealment_procedure
     syntax match Conceal 'stract void'me=s+1 conceal cchar=o
     syntax match Conceal 'tract void' conceal cchar=c
 endif
+
+if exists('g:java_concealment_function') && get(g:, 'java_concealment_function') == 1
+    " public modifier
+    syntax match Conceal 'public\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=f
+    syntax match Conceal 'ublic\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=u
+    syntax match Conceal 'blic\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=n
+    syntax match Conceal 'lic\( static\)\?\( @NotNull\)\? \w\+' conceal cchar=c
+    " protected modifier
+    syntax match Conceal 'protected\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=f
+    syntax match Conceal 'rotected\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=u
+    syntax match Conceal 'otected\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=n
+    syntax match Conceal 'tected\( static\)\?\( @NotNull\)\? \w\+' conceal cchar=c
+    " private modifier
+    syntax match Conceal 'private\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=f
+    syntax match Conceal 'rivate\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=u
+    syntax match Conceal 'ivate\( static\)\?\( @NotNull\)\? \w\+'me=s+1 conceal cchar=n
+    syntax match Conceal 'vate\( static\)\?\( @NotNull\)\? \w\+' conceal cchar=c
+    " abstract modifier
+    syntax match Conceal 'abstract\( @NotNull\)\? \w\+'me=s+1 conceal cchar=f
+    syntax match Conceal 'bstract\( @NotNull\)\? \w\+'me=s+1 conceal cchar=u
+    syntax match Conceal 'stract\( @NotNull\)\? \w\+'me=s+1 conceal cchar=n
+    syntax match Conceal 'tract\( @NotNull\)\? \w\+' conceal cchar=c
+endif
+
+syntax match Conceal '*' conceal cchar=⋄
+syntax match Conceal '<=' conceal cchar=≤
+syntax match Conceal '<=' conceal cchar=≤
+syntax match Conceal '>=' conceal cchar=≥
+syntax match Conceal '!=' conceal cchar=≠
+syntax match Conceal '->' conceal cchar=→
+syntax match Conceal '&&' conceal cchar=∧
+syntax match Conceal '||' conceal cchar=∨
+syntax match Conceal '!'  conceal cchar=¬
+syntax match Conceal '=='  conceal cchar=⟺
+syntax match Conceal ' = 'ms=s+1,me=e-1 conceal cchar=←
+
+syntax match Conceal 'true'   conceal cchar=⊤
+syntax match Conceal 'false'  conceal cchar=⊥
+
 
 
 " CUSTOM CODE ENDS
