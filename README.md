@@ -82,7 +82,7 @@ replace every occurrence of a string `final @NotNull var` with a word `let`, but
 you can only do that **char by char**. Thus, instead of having only **one**
 `syntax` command, we need **three** of them for every char. And in each case
 replacement should happen not for a whole string, but only for certain part of
-it. This is where `ms` and `me` flags come into play. Let me firstly show you
+it. This is where `ms` and `me` flags come into play. Let me first show you
 the answer, and then I will explain:
 ```
 syntax match Conceal /final @NotNull var/me=s+1 conceal cchar=l
@@ -102,8 +102,8 @@ Similarly, `ms` signifies the *start* of a match, and `ms=e-1` can be used to
 exclude last letter from it.
 
 So far so good, but why `f` and `fi` are omitted in the next two commands?
-Firstly because they will be concealed, and no concealed item can be matched.
-And secondly because we still need some way to group these three commands
+Firstly, because they will be concealed, and no concealed item can be matched.
+And secondly, because we still need some way to group these three commands
 together, and the only way to do that is to ensure that the next match will
 happen as close as possible to the current one.
 
@@ -150,19 +150,19 @@ A: I used a snippet expansion feature of [this](https://github.com/Shougo/neosni
 plugin.
 
 ### Q: Can I use `val` instead of `let`?
-A: Put the following in your .vimrc:
+A: 
 ```
 let g:java_concealment_use_let = 0
 ```
 
 ### Q: I don't use `@NotNull` in my code.
-A: Put the following in your .vimrc:
+A: 
 ```
 let g:java_concealment_use_notnull = 0
 ```
 
 ### Q: What about other primitive types?
-A: Put the following in your .vimrc:
+A: 
 ```
 let g:java_concealment_primitive = 1
 ```
