@@ -59,7 +59,7 @@ syn match   javaClassDecl	"@interface\>"
 syn keyword javaBranch		break continue nextgroup=javaUserLabelRef skipwhite
 syn match   javaUserLabelRef	"\k\+" contained
 syn match   javaVarArg		"\.\.\."
-" syn match javaScopeDecl	"\v( public | protected | private | abstract )"
+syn match javaScopeDecl	"\v(public|protected|private|abstract)"
 
 if exists("java_highlight_java_lang_ids")
   let java_highlight_all=1
