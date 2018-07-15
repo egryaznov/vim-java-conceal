@@ -41,8 +41,7 @@ syn keyword javaBoolean		true false
 syn keyword javaConstant	null
 syn keyword javaTypedef		this super
 syn keyword javaOperator	new instanceof
-syn match   javaType		"(boolean|char|byte|short|int|long|float|double|var)"
-syn keyword javaType		void
+syn match   javaType		"\v( boolean | char | byte | short | int | long | float | double | var | void )"
 syn keyword javaStatement	return
 syn keyword javaStorageClass	static synchronized transient volatile strictfp serializable
 syn match   javaStorageClass "final"
@@ -60,7 +59,7 @@ syn match   javaClassDecl	"@interface\>"
 syn keyword javaBranch		break continue nextgroup=javaUserLabelRef skipwhite
 syn match   javaUserLabelRef	"\k\+" contained
 syn match   javaVarArg		"\.\.\."
-syn keyword javaScopeDecl	public protected private abstract
+" syn match javaScopeDecl	"\v( public | protected | private | abstract )"
 
 if exists("java_highlight_java_lang_ids")
   let java_highlight_all=1
@@ -348,42 +347,84 @@ let s:t = 't'
 if exists('g:java_concealment_use_let')
     let s:use_let = get(g:, 'java_concealment_use_let')
     if s:use_let == 0
-        s:l = 'v'
-        s:e = 'a'
-        s:t = 'l'
+        let s:l = 'v'
+        let s:e = 'a'
+        let s:t = 'l'
+        echomsg 'We use VAL now'
     endif
 endif
 " Do we want to use '@NotNull'?
-let s:not_null = ' @NotNull'
+let s:not_null = ' @NotNull '
 if exists('g:java_concealment_use_notnull')
     let s:use_not_null = get(g:, 'java_concealment_use_notnull')
     if s:use_not_null == 0
-        s:not_null = ' '
+        let s:not_null = ' \(@NotNull \)\?'
+        echomsg "Don't use NotNull"
+    endif
+endif
+" Define some functions
+
+function! ConcealAll()
+    execute 'syntax match Conceal "final' . s:not_null . '\w\+"me=s+1 conceal cchar=' . s:l
+    execute 'syntax match Conceal "inal'. s:not_null . '\w\+"me=s+1 conceal cchar=' . s:e
+    execute 'syntax match Conceal "nal'. s:not_null . '\w\+" conceal cchar=' . s:t
+    echomsg 'Conceal EVERYTHING'
+endfunction
+
+function! ConcealPrimitive()
+    for keyword in ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double', 'var']
+        execute 'syntax match Conceal "final' . s:not_null . keyword . '"me=s+1 conceal cchar=' . s:l
+        execute 'syntax match Conceal "inal'. s:not_null . keyword . '"me=s+1 conceal cchar=' . s:e
+        execute 'syntax match Conceal "nal'. s:not_null . keyword . '" conceal cchar=' . s:t
+    endfor
+    echomsg 'Conceal only primitive'
+endfunction
+
+function! ConcealVar()
+    execute 'syntax match Conceal "final' . s:not_null . 'var"me=s+1 conceal cchar=' . s:l
+    execute 'syntax match Conceal "inal'. s:not_null . 'var"me=s+1 conceal cchar=' . s:e
+    execute 'syntax match Conceal "nal'. s:not_null . 'var" conceal cchar=' . s:t
+    echomsg 'Conceal only var'
+endfunction
+
+" Start concealment
+if exists('g:java_concealment_all') && get(g:, 'java_concealment_all') == 1
+    call ConcealAll()
+else
+    if exists('g:java_concealment_primitive') && get(g:, 'java_concealment_primitive') == 1
+        call ConcealPrimitive()
+    else
+        call ConcealVar()
     endif
 endif
 
-if exists('g:java_concealment_all')
-    let s:need_to_conceal_all = get(g:, 'java_concealment_all')
-    if s:need_to_conceal_all == 1
-        execute 'syntax match Conceal "final' . s:not_null . ' \w\+"me=s+1 conceal cchar=' . s:l
-        execute 'syntax match Conceal "inal'. s:not_null . ' \w\+"me=s+1 conceal cchar=' . s:e
-        execute 'syntax match Conceal "nal'. s:not_null . ' \w\+" conceal cchar=' . s:t
-    endif
-else
-    if exists('g:java_concealment_primitive')
-    let s:conceal_only_primitive = get(g: 'java_concealment_primitive')
-    if s:conceal_only_primitive == 1
-        for keyword in ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double', 'var']
-            execute 'syntax match Conceal "final' . s:not_null . ' ' . keyword . '"me=s+1 conceal cchar=' . s:l
-            execute 'syntax match Conceal "inal'. s:not_null . ' ' . keyword . '"me=s+1 conceal cchar=' . s:e
-            execute 'syntax match Conceal "nal'. s:not_null . ' ' . keyword . '" conceal cchar=' . s:t
-        endfor
-    else
-        execute 'syntax match Conceal "final' . s:not_null . ' var"me=s+1 conceal cchar=' . s:l
-        execute 'syntax match Conceal "inal'. s:not_null . ' var"me=s+1 conceal cchar=' . s:e
-        execute 'syntax match Conceal "nal'. s:not_null . ' var" conceal cchar=' . s:t
-    endif
+if exists('g:java_concealment_hide_semicolons') && get(g:, 'java_concealment_hide_semicolons') == 1
+    syntax match Conceal ';' conceal
 endif
+
+if exists('g:java_concealment_procedure') && get(g:, 'java_concealment_procedure') == 1
+    " public modifier
+    syntax match Conceal 'public\( static\)\? void'me=s+1 conceal cchar=p
+    syntax match Conceal 'ublic\( static\)\? void'me=s+1 conceal cchar=r
+    syntax match Conceal 'blic\( static\)\? void'me=s+1 conceal cchar=o
+    syntax match Conceal 'lic\( static\)\? void' conceal cchar=c
+    " protected modifier
+    syntax match Conceal 'protected\( static\)\? void'me=s+1 conceal cchar=p
+    syntax match Conceal 'rotected\( static\)\? void'me=s+1 conceal cchar=r
+    syntax match Conceal 'otected\( static\)\? void'me=s+1 conceal cchar=o
+    syntax match Conceal 'tected\( static\)\? void' conceal cchar=c
+    " private modifier
+    syntax match Conceal 'private\( static\)\? void'me=s+1 conceal cchar=p
+    syntax match Conceal 'rivate\( static\)\? void'me=s+1 conceal cchar=r
+    syntax match Conceal 'ivate\( static\)\? void'me=s+1 conceal cchar=o
+    syntax match Conceal 'vate\( static\)\? void' conceal cchar=c
+    " abstract modifier
+    syntax match Conceal 'abstract void'me=s+1 conceal cchar=p
+    syntax match Conceal 'bstract void'me=s+1 conceal cchar=r
+    syntax match Conceal 'stract void'me=s+1 conceal cchar=o
+    syntax match Conceal 'tract void' conceal cchar=c
+endif
+
 
 " CUSTOM CODE ENDS
 " vim: ts=8

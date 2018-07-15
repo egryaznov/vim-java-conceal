@@ -141,44 +141,59 @@ like in GIF above.
 
 ## FAQ
 
-##### Is any other editor/IDE has a similar feature?
-Yes, Emacs and IntelliJ IDEA have full support of it, although in IDEA it's
+### Q: Is any other editor/IDE has a similar feature?
+A: Yes, Emacs and IntelliJ IDEA have full support of it, although in IDEA it's
 called *Folding*.
 
-##### How did you write `let` so quickly?
-I used a snippet expansion feature of [this](github.com/Shougo/neosnippet.vim)
+### Q: How did you write `let` so quickly?
+A: I used a snippet expansion feature of [this](https://github.com/Shougo/neosnippet.vim)
 plugin.
 
-##### Can I use `val` instead of `let`?
-Put the following in your .vimrc:
+### Q: Can I use `val` instead of `let`?
+A: Put the following in your .vimrc:
 ```
 let g:java_concealment_use_let = 0
 ```
 
-##### I don't use `@NotNull` in my code.
-Put the following in your .vimrc:
+### Q: I don't use `@NotNull` in my code.
+A: Put the following in your .vimrc:
 ```
 let g:java_concealment_use_notnull = 0
 ```
 
-##### What about other primitive types?
-Put the following in your .vimrc:
+### Q: What about other primitive types?
+A: Put the following in your .vimrc:
 ```
 let g:java_concealment_primitive = 1
 ```
 
-##### Can I conceal ALL constant declarations with ALL possible types?
-Put the following in your .vimrc:
+### Q: Can I conceal ALL constant declarations with ALL possible types?
+A: Put the following in your .vimrc:
 ```
 let g:java_concealment_all = 1
 ```
 
-##### I want the feature to behave differently.
-You should be able to write your own `syntax` definitions for concealment
+### Q: Can I hide those pecky semicolons?
+A: Yes.
+```
+let g:java_concealment_hide_semicolons = 1
+```
+
+### Q: What other boilerplate code I can conceal?
+A: You can replace every definition of a method, which returns `void`
+with `proc`:
+```
+let g:java_concealment_procedure = 1
+```
+
+![Procedure][proc]
+
+### Q: I want the feature to behave differently.
+A: You should be able to write your own `syntax` definitions for concealment
 if you thoroughly read **The Whole Story** section.
 
-##### Can I use regular expressions instead of plain string?
-~~No.~~ Yes, if you are smart about it. The only problem of using them lies in
+### Q: Can I use regular expressions instead of plain string?
+A: ~~No.~~ Yes, if you are smart about it. The only problem of using them lies in
 the fact that you generally cannot predict the length of a matched string.
 Therefore, you don't know how to delineate a specific part of expression you want
 to conceal with a single char. But if the first `k` letters, where `k` equals
@@ -194,16 +209,17 @@ syntax match Conceal "nal @NotNull \w\+" conceal cchar=t
 Here we needed only first three hard-coded letters of the word `final` to make
 everything work.
 
-##### Is there any other, non-hacky way to do this?
-Not to my knowledge. As was explained in **The Whole Story** section, there are
+### Q: Is there any other, non-hacky way to do this?
+A: Not to my knowledge. As was explained in **The Whole Story** section, there are
 a couple of limitation in the Vim's concealment mechanism that forces us to
 resort to an expedient solution. One possible alternative is to implement this
 directly in Vim itself by making the `conceal` mechanism to accept strings of
-any length and then send a push request to Bram Moolenaar. Well, *good luck with
-that*.
+any length and then send a push request to Bram Moolenaar. Well, good luck with
+that.
 
 # Acknowledgment
 Thanks to [Marko Trosi](https://github.com/marcotrosi) for support, check out
 his Vim Telegram chat group: https://t.me/VimUserGroup.
 
 [showcase]: https://media.giphy.com/media/jb3yeutGEpFyU4oGae/giphy.gif
+[proc]: https://media.giphy.com/media/3BMJzHZPX4F4wbBk7E/giphy.gif
